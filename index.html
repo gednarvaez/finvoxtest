@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simple JavaScrip Test</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+    }
+
+    #app{
+        
+        max-width: 320px;
+        max-height: 600px;
+        overflow: auto;
+        text-align: justify;
+        padding: 20px 10px;
+        border-top: 1px solid #78ccfd;
+        margin: 5px;
+    }
+
+    #app::-webkit-scrollbar {
+        width: .5em;
+    }
+ 
+    #app::-webkit-scrollbar-track{
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    }
+ 
+    #app::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 1px solid slategrey;
+    }
+
+    body{
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background: whitesmoke;
+    }
+
+    #app > div{
+        background: #a1dcff2e;
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #b0b0d0;
+        color: #01017b;
+        margin: 5px 0;
+        transition: opacity 0.25s;
+    }
+
+    #app > div:hover{
+        background: cadetblue;
+        color: white;
+        opacity: .5;
+    }
+
+    #show-more{
+        background: rgb(55, 68, 68);
+        border: none;
+        color: white;
+        padding: 10px 30px;
+        border-radius: 5px;
+    }
+
+   
+</style>
+<body>
+    <button id="show-more">Show More</button>
+    <div id="app">
+        
+    </div>
+    <script>
+        (function(){
+            let cant = -11;
+            showPost(cant);
+            let buttonMore = document.getElementById("show-more");
+            buttonMore.addEventListener("click", ()=>{
+                document.getElementById("app").innerHTML = "";
+                cant = cant-10
+                showPost(cant);
+            })
+        })();
+
+
+        function showPost(cant){
+            getApiResponse("post").then((post) => {
+                console.log(cant)
+                post.slice(cant).forEach(function (elem, i) {
+                    drawElements(elem.title);
+                    if (i == 0) {
+                        getApiResponse("comments").then((comm) => {
+                            console.log(comm.filter(e => e.postId == elem.id).slice(-3))
+                        })
+                    }
+                });
+            });
+        }
+
+        async function getApiResponse(type) {  //Get response of all post and comments
+            if (type == "post") {
+                url = 'https://jsonplaceholder.typicode.com/posts';
+            }
+            else if (type == "comments") {
+                url = 'https://jsonplaceholder.typicode.com/comments';
+            }
+            return await fetch(url)
+            .then(response => {
+                if (response.status == 200) {
+                    return response.json();
+                } else {
+                    console.error("This is an error")
+                    throw Promise.reject(new Error("Houston, we have a problem!"));
+                }
+            })
+        }
+
+        function drawElements(text){ // Draw post Title
+            
+            const content = document.getElementById("app");
+            const commDiv = document.createElement("div");
+            const commText = document.createTextNode(text);
+
+            commDiv.append(commText);
+            content.append(commDiv);
+        }
+    
+      /* 
+         Please put inside the div with id 'app' the last 10 posts (ordered by id) 
+         from this endpoint https://jsonplaceholder.typicode.com/posts 
+         Add to the DOM just items with the post title.
+        
+        2. Once this request is finished succesfully get the 3 last comments asociated with the first
+        post of the list using this endpoint https://jsonplaceholder.typicode.com/comments
+        For this test just request them, you don't need to add them to the DOM.
+        
+        3. Include a console.error if any request returns an error.
+        
+        4. About styles, don't think about look & feel, but set the div with id 'app' centered vertical and horizontal
+        to the window with a max-width of 320px. 
+        
+        Please use ES6. Besides, you are allowed to use React, Angular or Vue, but it isn't mandatory.
+   
+        Send your answer using a static GitHubGist or any web service like https://codepen.io/
+        
+        If you have any doubts, write a comment here or send a message throgh Get on Board.
+      */
+    </script>
+</body>
+</html>
+
